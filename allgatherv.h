@@ -1,5 +1,12 @@
 #pragma once
 
+/*
+ * allgatherv.hpp  -- MPI_Allgatherv wrapper for std::vector
+ *
+ * Copyright (C) 2015 Lorenz Hübschle-Schneider <lorenz@4z2.de>
+ * Published under the Boost Software License, Version 1.0
+ */
+
 #include <errno.h>
 #include <mpi.h>
 

@@ -1,5 +1,14 @@
 #pragma once
 
+/*
+ * broadcast.hpp  -- MPI_Bcast wrapper for std::vector, supports serialization
+ *                   using Boost.Serialize
+ *
+ * Copyright (C) 2015 Lorenz Hübschle-Schneider <lorenz@4z2.de>
+ * Published under the Boost Software License, Version 1.0
+ */
+
+
 #include <mpi.h>
 #include <errno.h>
 
