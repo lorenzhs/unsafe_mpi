@@ -23,7 +23,7 @@
 namespace unsafe_mpi {
 
 template <typename T>
-static void allgatherv_serialize(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out) {
+void allgatherv_serialize(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out) {
     // Step 1: serialize input data
     boost::mpi::packed_oarchive oa(comm);
     if (!in.empty())
@@ -84,7 +84,7 @@ static void allgatherv_serialize(const boost::mpi::communicator &comm, const std
 
 
 template <typename T, typename transmit_type=uint64_t>
-static void allgatherv_unsafe(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out) {
+void allgatherv_unsafe(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out) {
     static_assert((sizeof(T)/sizeof(transmit_type)) * sizeof(transmit_type) == sizeof(T),
         "Invalid transmit_type for element type (sizeof(transmit_type) is not a multiple of sizeof(T))");
 
@@ -119,7 +119,7 @@ static void allgatherv_unsafe(const boost::mpi::communicator &comm, const std::v
 }
 
 template <typename T, typename transmit_type=uint64_t>
-static void allgatherv(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out) {
+void allgatherv(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out) {
     // Trivial (enough) datatypes can be transmit directly via MPI_Allgatherv
     // For all others, we have to serialize them using boost::serialize
     if (is_trivial_enough<T>::value) {

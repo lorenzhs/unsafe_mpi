@@ -22,7 +22,7 @@
 namespace unsafe_mpi {
 
 template <typename T, typename transmit_type = uint64_t>
-static void gatherv_trivial(const boost::mpi::communicator &comm,
+void gatherv_trivial(const boost::mpi::communicator &comm,
                             const std::vector<T> &in, std::vector<T> &out,
                             const int root) {
 
@@ -65,7 +65,7 @@ static void gatherv_trivial(const boost::mpi::communicator &comm,
 
 // UNTESTED, mostly copied from allgatherv
 template <typename T>
-static void gatherv_serialize(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out, const int root) {
+void gatherv_serialize(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out, const int root) {
     // Step 1: serialize input data
     boost::mpi::packed_oarchive oa(comm);
     if (!in.empty())
@@ -145,7 +145,7 @@ static void gatherv_serialize(const boost::mpi::communicator &comm, const std::v
 
 
 template <typename T, typename transmit_type = uint64_t>
-static void gatherv(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out, const int root) {
+void gatherv(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out, const int root) {
     if (is_trivial_enough<T>::value) {
         gatherv_trivial<T, transmit_type>(comm, in, out, root);
     } else {

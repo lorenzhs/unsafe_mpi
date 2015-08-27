@@ -12,7 +12,7 @@ namespace unsafe_mpi {
 // Send `size` elements of type `T` starting at `data` to `dest` via `comm` with `tag`,
 // using trivial type `transmit_type` if `T` is Standard Layout
 template <typename T, typename transmit_type = uint64_t>
-static void send(const boost::mpi::communicator &comm, int dest, int tag, const T *data, const size_t size) {
+void send(const boost::mpi::communicator &comm, int dest, int tag, const T *data, const size_t size) {
     const bool trivial = is_trivial_enough<T>::value;
     static_assert(!trivial || (sizeof(T)/sizeof(transmit_type)) * sizeof(transmit_type) == sizeof(T),
                   "Invalid transmit_type for element type (sizeof(transmit_type) is not a multiple of sizeof(T))");
@@ -33,13 +33,13 @@ static void send(const boost::mpi::communicator &comm, int dest, int tag, const 
 
 // convenience wrapper for vectors
 template <typename T, typename transmit_type = uint64_t>
-static void send(const boost::mpi::communicator &comm, int dest, int tag, const std::vector<T> &data) {
+void send(const boost::mpi::communicator &comm, int dest, int tag, const std::vector<T> &data) {
     send<T, transmit_type>(comm, dest, tag, data.data(), data.size());
 }
 
 
 template <typename T, typename transmit_type = uint64_t>
-static void recv(const boost::mpi::communicator &comm, int src, int tag, std::vector<T> &data) {
+void recv(const boost::mpi::communicator &comm, int src, int tag, std::vector<T> &data) {
     const bool trivial = is_trivial_enough<T>::value;
     static_assert(!trivial || (sizeof(T)/sizeof(transmit_type)) * sizeof(transmit_type) == sizeof(T),
                   "Invalid transmit_type for element type (sizeof(transmit_type) is not a multiple of sizeof(T))");
