@@ -7,10 +7,10 @@
  * Published under the Boost Software License, Version 1.0
  */
 
-#include "common.h"
-#include "point-to-point.h"
+// Point-to-Point communication
+#include "include/point-to-point.h"
 
-// Collectives
-#include "broadcast.h"
-#include "allgatherv.h"
-#include "gatherv.h"
+// Collective communication
+#include "include/broadcast.h"
+#include "include/allgatherv.h"
+#include "include/gatherv.h"
