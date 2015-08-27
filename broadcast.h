@@ -74,7 +74,7 @@ void broadcast(const boost::mpi::communicator &comm, std::vector<T> &data, int r
             ia.resize(archive_size);
             // Receive broadcast archive data
             auto recvptr = ia.address();
-            MPI_Bcast(recvptr, archive_size, MPI_PACKED, root, comm);
+            int status = MPI_Bcast(recvptr, archive_size, MPI_PACKED, root, comm);
             if (status != 0) {
                 ERR << "MPI_Bcast returned non-zero value " << status
                     << ", errno: " << errno << std::endl;

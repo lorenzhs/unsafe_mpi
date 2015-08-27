@@ -22,17 +22,6 @@
 
 namespace unsafe_mpi {
 
-template <typename T, typename transmit_type=uint64_t>
-static void allgatherv(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out) {
-    // Trivial (enough) datatypes can be transmit directly via MPI_Allgatherv
-    // For all others, we have to serialize them using boost::serialize
-    if (is_trivial_enough<T>::value) {
-        allgatherv_unsafe<T, transmit_type>(comm, in, out);
-    } else {
-        allgatherv_serialize<T>(comm, in, out);
-    }
-}
-
 template <typename T>
 static void allgatherv_serialize(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out) {
     // Step 1: serialize input data
@@ -129,5 +118,15 @@ static void allgatherv_unsafe(const boost::mpi::communicator &comm, const std::v
     }
 }
 
+template <typename T, typename transmit_type=uint64_t>
+static void allgatherv(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out) {
+    // Trivial (enough) datatypes can be transmit directly via MPI_Allgatherv
+    // For all others, we have to serialize them using boost::serialize
+    if (is_trivial_enough<T>::value) {
+        allgatherv_unsafe<T, transmit_type>(comm, in, out);
+    } else {
+        allgatherv_serialize<T>(comm, in, out);
+    }
+}
 
 }

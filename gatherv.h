@@ -13,23 +13,13 @@
 #include <boost/mpi/packed_iarchive.hpp>
 #include <boost/mpi/packed_oarchive.hpp>
 
-#Include <boost/serialization/string.hpp>
+#include <boost/serialization/string.hpp>
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
 
 #include "common.h"
 
 namespace unsafe_mpi {
-
-
-template <typename T, typename transmit_type = uint64_t>
-static void gatherv(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out, const int root) {
-    if (is_trivial_enough<T>::value) {
-        gatherv_trivial<T, transmit_type>(comm, in, out, root);
-    } else {
-        gatherv_serialize<T>(comm, in, out, root);
-    }
-}
 
 template <typename T, typename transmit_type = uint64_t>
 static void gatherv_trivial(const boost::mpi::communicator &comm,
@@ -151,6 +141,16 @@ static void gatherv_serialize(const boost::mpi::communicator &comm, const std::v
 
     }
 
+}
+
+
+template <typename T, typename transmit_type = uint64_t>
+static void gatherv(const boost::mpi::communicator &comm, const std::vector<T> &in, std::vector<T> &out, const int root) {
+    if (is_trivial_enough<T>::value) {
+        gatherv_trivial<T, transmit_type>(comm, in, out, root);
+    } else {
+        gatherv_serialize<T>(comm, in, out, root);
+    }
 }
 
 }
