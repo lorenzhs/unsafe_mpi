@@ -46,7 +46,7 @@ void gatherv_trivial(const boost::mpi::communicator &comm,
     if (comm.rank() == root) {
         // Receive sizes
         std::vector<int> sizes;
-        sizes.reserve(comm.size());
+        sizes.reserve(static_cast<size_t>(comm.size()));
         boost::mpi::gather(comm, sendsize, sizes, root);
 
         // Calculate displacements from spaces
@@ -86,14 +86,15 @@ void gatherv_serialize(const boost::mpi::communicator &comm, const std::vector<T
     auto sendptr = const_cast<void*>(oa.address());
 
     if (comm.rank() == root) {
-        std::vector<int> in_sizes(comm.size()), transmit_sizes(comm.size());
+        const size_t comm_size = static_cast<size_t>(comm.size());
+        std::vector<int> in_sizes(comm_size), transmit_sizes(comm_size);
         boost::mpi::gather<int>(comm, in_size,       in_sizes.data(), root);
         boost::mpi::gather<int>(comm, transmit_size, transmit_sizes.data(), root);
 
         // Step 3: calculate displacements from sizes (prefix sum)
-        std::vector<int> displacements(comm.size() + 1);
+        std::vector<int> displacements(comm_size + 1);
         displacements[0] = sizeof(boost::mpi::packed_iarchive);
-        for (int i = 1; i <= comm.size(); ++i) {
+        for (size_t i = 1; i <= comm_size; ++i) {
             displacements[i] = displacements[i-1] + transmit_sizes[i-1];
         }
 
@@ -113,19 +114,20 @@ void gatherv_serialize(const boost::mpi::communicator &comm, const std::vector<T
         // Step 5: deserialize received data
         // Preallocate storage to prevent reallocations
         std::vector<T> temp;
-        size_t largest_size = *std::max_element(in_sizes.begin(), in_sizes.end());
+        auto largest_size = *std::max_element(in_sizes.begin(), in_sizes.end());
         temp.reserve(largest_size);
         out.reserve(std::accumulate(in_sizes.begin(), in_sizes.end(), 0));
 
         // Deserialize archives one by one, inserting elements at the end of ̀out̀
-        for (int i = 0; i < comm.size(); ++i) {
+        for (size_t i = 0; i < comm_size; ++i) {
             if (in_sizes[i] == 0) {
                 // We can ignore processes which didn't have anything to send
                 continue;
             }
             boost::mpi::packed_iarchive archive(comm);
-            archive.resize(transmit_sizes[i]);
-            memcpy(archive.address(), recv + displacements[i], transmit_sizes[i]);
+            const size_t transmit_size_i = static_cast<size_t>(transmit_sizes[i]);
+            archive.resize(transmit_size_i);
+            memcpy(archive.address(), recv + displacements[i], transmit_size_i);
 
             temp.clear();
             temp.resize(in_sizes[i]);

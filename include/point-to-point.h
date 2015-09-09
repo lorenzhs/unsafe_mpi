@@ -31,9 +31,9 @@ void send(const boost::mpi::communicator &comm, int dest, int tag, const T *data
     if (trivial) {
         auto sendptr = reinterpret_cast<const transmit_type*>(data);
         auto sendsize = size * sizeof(T)/sizeof(transmit_type);
-        comm.send(dest, tag, sendptr, sendsize);
+        comm.send(dest, tag, sendptr, static_cast<int>(sendsize));
     } else {
-        comm.send(dest, tag, data, size);
+        comm.send(dest, tag, data, static_cast<int>(size));
     }
 }
 
@@ -60,9 +60,9 @@ void recv(const boost::mpi::communicator &comm, int src, int tag, std::vector<T>
     if (trivial) {
         auto recvptr = reinterpret_cast<transmit_type*>(data.data());
         auto recvsize = size * sizeof(T)/sizeof(transmit_type);
-        comm.recv(src, tag, recvptr, recvsize);
+        comm.recv(src, tag, recvptr, static_cast<int>(recvsize));
     } else {
-        comm.recv(src, tag, data.data(), size);
+        comm.recv(src, tag, data.data(), static_cast<int>(size));
     }
 }
 

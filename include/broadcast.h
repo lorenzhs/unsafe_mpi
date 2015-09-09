@@ -66,24 +66,26 @@ void broadcast(const boost::mpi::communicator &comm, std::vector<T> &data, int r
             boost::mpi::packed_oarchive oa(comm);
             oa << data;
             // Broadcast archive size
-            int archive_size = static_cast<int>(oa.size());
+            size_t archive_size = oa.size();
             boost::mpi::broadcast(comm, archive_size, root);
             // Broadcast archive data
             auto sendptr = const_cast<void*>(oa.address());
-            int status = MPI_Bcast(sendptr, archive_size, MPI_PACKED, root, comm);
+            int status = MPI_Bcast(sendptr, static_cast<int>(archive_size),
+                                   MPI_PACKED, root, comm);
             if (status != 0) {
                 ERR << "MPI_Bcast returned non-zero value " << status
                     << ", errno: " << errno << std::endl;
             }
         } else {
             // Receive archive size and allocate space
-            int archive_size;
+            size_t archive_size;
             boost::mpi::broadcast(comm, archive_size, root);
             boost::mpi::packed_iarchive ia(comm);
             ia.resize(archive_size);
             // Receive broadcast archive data
             auto recvptr = ia.address();
-            int status = MPI_Bcast(recvptr, archive_size, MPI_PACKED, root, comm);
+            int status = MPI_Bcast(recvptr, static_cast<int>(archive_size),
+                                   MPI_PACKED, root, comm);
             if (status != 0) {
                 ERR << "MPI_Bcast returned non-zero value " << status
                     << ", errno: " << errno << std::endl;
