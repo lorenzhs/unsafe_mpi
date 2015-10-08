@@ -26,6 +26,7 @@ void send(const boost::mpi::communicator &comm, int dest, int tag, const T *data
 
     // send size
     comm.send(dest, tag, size);
+    if (size == 0) return; // nothing to send
 
     // send actual data
     if (trivial) {
@@ -53,7 +54,9 @@ boost::mpi::status recv(const boost::mpi::communicator &comm, int src, int tag, 
 
     auto size = data.size(); // for the type deduction
     // receive size and resize
-    comm.recv(src, tag, size);
+    auto status = comm.recv(src, tag, size);
+    if (size == 0) return status; // nothing coming...
+
     data.resize(size);
 
     // receive actual data
