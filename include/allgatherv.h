@@ -22,10 +22,10 @@
 #include <boost/mpi/packed_oarchive.hpp>
 
 #include <boost/serialization/string.hpp>
-#include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
 
 #include "common.h"
+#include "tuple_serialization.h"
 
 namespace unsafe_mpi {
 
