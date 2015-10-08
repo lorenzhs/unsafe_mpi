@@ -46,7 +46,7 @@ void send(const boost::mpi::communicator &comm, int dest, int tag, const std::ve
 
 
 template <typename T, typename transmit_type = uint64_t>
-void recv(const boost::mpi::communicator &comm, int src, int tag, std::vector<T> &data) {
+boost::mpi::status recv(const boost::mpi::communicator &comm, int src, int tag, std::vector<T> &data) {
     const bool trivial = is_trivial_enough<T>::value;
     static_assert(!trivial || (sizeof(T)/sizeof(transmit_type)) * sizeof(transmit_type) == sizeof(T),
                   "Invalid transmit_type for element type (sizeof(transmit_type) is not a multiple of sizeof(T))");
@@ -60,9 +60,9 @@ void recv(const boost::mpi::communicator &comm, int src, int tag, std::vector<T>
     if (trivial) {
         auto recvptr = reinterpret_cast<transmit_type*>(data.data());
         auto recvsize = size * sizeof(T)/sizeof(transmit_type);
-        comm.recv(src, tag, recvptr, static_cast<int>(recvsize));
+        return comm.recv(src, tag, recvptr, static_cast<int>(recvsize));
     } else {
-        comm.recv(src, tag, data.data(), static_cast<int>(size));
+        return comm.recv(src, tag, data.data(), static_cast<int>(size));
     }
 }
 
